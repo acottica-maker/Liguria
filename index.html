@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mappa scadenze manutenzione Liguria</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.css">
+<style>
+html,body,#map{height:100%;width:100%;margin:0;padding:0}
+body{font-family:Arial,sans-serif}
+.legend{position:absolute;z-index:3;right:12px;top:12px;background:#fff;padding:10px 12px;border-radius:7px;box-shadow:0 1px 7px #777;line-height:23px;font-size:13px}
+.legend-title{font-weight:700;margin-bottom:4px}
+.legend-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:7px;border:1px solid #333;vertical-align:-1px}
+.station-marker{display:flex;align-items:center;white-space:nowrap;cursor:pointer;transform:translate(7px,0)}
+.station-dot{width:15px;height:15px;min-width:15px;border:2px solid #333;border-radius:50%;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.station-label{margin-left:4px;padding:2px 5px;background:rgba(255,255,255,.90);border:1px solid rgba(60,60,60,.45);border-radius:3px;color:#111;font-size:11px;font-weight:600;line-height:14px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.maplibregl-popup-content{font-size:13px;line-height:1.45;min-width:220px}
+#errore{display:none;position:absolute;z-index:5;left:18px;bottom:18px;background:#fff3cd;color:#664d03;padding:12px;border:1px solid #ffecb5;border-radius:5px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="legend"><div class="legend-title">Scadenza manutenzione</div><div><span class="legend-dot" style="background:#D7191C"></span>Entro 30/11/2026</div><div><span class="legend-dot" style="background:#F28E2B"></span>01/12/2026 - 09/01/2027</div><div><span class="legend-dot" style="background:#9E9E9E"></span>10/01/2027 - 17/01/2027</div></div>
+<div id="errore">Impossibile caricare la cartografia. Verifica la connessione Internet o prova con Chrome/Edge.</div>
+<script src="https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.js"></script>
+<script>
+const stazioni=[{"nome":"Castelvecchio di R. B.","lat":44.13202,"lon":8.11888,"scadenza":"17/11/2026","scadenzaISO":"2026-11-17","attivita":"ordinaria"},{"nome":"Dolcedo","lat":43.9059,"lon":7.9515,"scadenza":"17/11/2026","scadenzaISO":"2026-11-17","attivita":"ordinaria"},{"nome":"Testico","lat":44.00653,"lon":8.03517,"scadenza":"17/11/2026","scadenzaISO":"2026-11-17","attivita":"ordinaria"},{"nome":"Albenga - Molino Branca","lat":44.04882,"lon":8.21077,"scadenza":"20/11/2026","scadenzaISO":"2026-11-20","attivita":"ordinaria"},{"nome":"Prai","lat":44.51775,"lon":8.67306,"scadenza":"20/11/2026","scadenzaISO":"2026-11-20","attivita":"ordinaria"},{"nome":"Genova - Granara","lat":44.43671,"lon":8.82023,"scadenza":"20/11/2026","scadenzaISO":"2026-11-20","attivita":"ordinaria"},{"nome":"Ventimiglia - Ponte Aniante","lat":43.81253,"lon":7.59046,"scadenza":"21/11/2026","scadenzaISO":"2026-11-21","attivita":"ordinaria"},{"nome":"La Presa","lat":44.44076,"lon":9.04717,"scadenza":"27/11/2026","scadenzaISO":"2026-11-27","attivita":"ordinaria"},{"nome":"Albenga - Isolabella","lat":44.06875,"lon":8.17956,"scadenza":"28/11/2026","scadenzaISO":"2026-11-28","attivita":"ordinaria+sostit. termometro"},{"nome":"Monte Cappellino","lat":44.54856,"lon":8.95422,"scadenza":"30/11/2026","scadenzaISO":"2026-11-30","attivita":"ordinaria+sostit. anemometro"},{"nome":"S.Martino-Idro","lat":44.35945,"lon":9.34391,"scadenza":"04/12/2026","scadenzaISO":"2026-12-04","attivita":"ordinaria"},{"nome":"Sestri Levante","lat":44.27377,"lon":9.40992,"scadenza":"04/12/2026","scadenzaISO":"2026-12-04","attivita":"ordinaria+sostit. termometro"},{"nome":"Sestri Levante - PonteSS1","lat":44.26672,"lon":9.4259,"scadenza":"04/12/2026","scadenzaISO":"2026-12-04","attivita":"ordinaria"},{"nome":"Carcare","lat":44.35662,"lon":8.28944,"scadenza":"05/12/2026","scadenzaISO":"2026-12-05","attivita":"ordinaria"},{"nome":"Dego - Girini","lat":44.45176,"lon":8.33939,"scadenza":"17/11/2026","scadenzaISO":"2026-11-17","attivita":"ordinaria+correttiva batteria+sostit. anemometro"},{"nome":"Carro","lat":44.27525,"lon":9.59772,"scadenza":"06/12/2026","scadenzaISO":"2026-12-06","attivita":"ordinaria+sostit. termometro"},{"nome":"Montalbano","lat":44.14,"lon":9.831,"scadenza":"07/12/2026","scadenzaISO":"2026-12-07","attivita":"ordinaria"},{"nome":"Nasceto","lat":44.27808,"lon":9.65595,"scadenza":"08/12/2026","scadenzaISO":"2026-12-08","attivita":"ordinaria"},{"nome":"S. Margherita Vara","lat":44.2747,"lon":9.65964,"scadenza":"08/12/2026","scadenzaISO":"2026-12-08","attivita":"ordinaria"},{"nome":"Campo Ligure","lat":44.54256,"lon":8.6939,"scadenza":"13/12/2026","scadenzaISO":"2026-12-13","attivita":"ordinaria+sostit. barometro"},{"nome":"Colle d'oggia","lat":43.98131,"lon":7.86667,"scadenza":"14/12/2026","scadenzaISO":"2026-12-14","attivita":"ordinaria"},{"nome":"Santuario di Savona","lat":44.34555,"lon":8.43753,"scadenza":"18/12/2026","scadenzaISO":"2026-12-18","attivita":"ordinaria"},{"nome":"Sanda","lat":44.36189,"lon":8.5273,"scadenza":"19/12/2026","scadenzaISO":"2026-12-19","attivita":"ordinaria"},{"nome":"Santuario Monte Gazzo","lat":44.44247,"lon":8.84485,"scadenza":"20/12/2026","scadenzaISO":"2026-12-20","attivita":"ordinaria"},{"nome":"Fontana Fresca","lat":44.4029,"lon":9.09318,"scadenza":"03/01/2027","scadenzaISO":"2027-01-03","attivita":"ordinaria"},{"nome":"Isoverde","lat":44.53013,"lon":8.85822,"scadenza":"04/01/2027","scadenzaISO":"2027-01-04","attivita":"ordinaria"},{"nome":"Genova - Pontedecimo","lat":44.48852,"lon":8.9001,"scadenza":"05/01/2027","scadenzaISO":"2027-01-05","attivita":"ordinaria+sostit. termometro"},{"nome":"Davagna","lat":44.46781,"lon":9.09539,"scadenza":"09/01/2027","scadenzaISO":"2027-01-09","attivita":"ordinaria"},{"nome":"Brugnato","lat":44.23132,"lon":9.71552,"scadenza":"11/01/2027","scadenzaISO":"2027-01-11","attivita":"ordinaria"},{"nome":"Crocetta di Orero","lat":44.52014,"lon":8.98586,"scadenza":"11/01/2027","scadenzaISO":"2027-01-11","attivita":"ordinaria"},{"nome":"Mignanego","lat":44.54028,"lon":8.93816,"scadenza":"15/01/2027","scadenzaISO":"2027-01-15","attivita":"ordinaria"},{"nome":"Montoggio","lat":44.51561,"lon":9.04769,"scadenza":"15/01/2027","scadenzaISO":"2027-01-15","attivita":"ordinaria"},{"nome":"Fallarosa","lat":44.51715,"lon":9.10336,"scadenza":"17/01/2027","scadenzaISO":"2027-01-17","attivita":"ordinaria"},{"nome":"Loco Carchelli","lat":44.55421,"lon":9.28421,"scadenza":"17/01/2027","scadenzaISO":"2027-01-17","attivita":"ordinaria"},{"nome":"Rovegno - Ponte","lat":44.56529,"lon":9.28156,"scadenza":"17/01/2027","scadenzaISO":"2027-01-17","attivita":"ordinaria"},{"nome":"Torriglia - Garaventa","lat":44.52927,"lon":9.175,"scadenza":"17/01/2027","scadenzaISO":"2027-01-17","attivita":"ordinaria"},{"nome":"Cengio","lat":44.38987,"lon":8.20417,"scadenza":"17/11/2026","scadenzaISO":"2026-11-17","attivita":"correttiva batteria"}];
+const limiteRosso='2026-11-30';
+const limiteArancione='2027-01-09';
+function colore(scadenza){if(scadenza<=limiteRosso)return '#D7191C';if(scadenza<=limiteArancione)return '#F28E2B';return '#9E9E9E';}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c];});}
+const map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/liberty',center:[8.83,44.20],zoom:7.5});
+map.addControl(new maplibregl.NavigationControl(),'top-left');
+const bounds=new maplibregl.LngLatBounds();
+stazioni.forEach(function(s){
+  const marker=document.createElement('div'); marker.className='station-marker';
+  const dot=document.createElement('span'); dot.className='station-dot'; dot.style.backgroundColor=colore(s.scadenzaISO);
+  const label=document.createElement('span'); label.className='station-label'; label.textContent=s.nome+' · '+s.scadenza;
+  marker.appendChild(dot); marker.appendChild(label);
+  const popupHtml='<b>'+escapeHtml(s.nome)+'</b><br><b>Coordinate:</b> '+s.lat.toFixed(5)+', '+s.lon.toFixed(5)+'<br><b>Scadenza:</b> '+escapeHtml(s.scadenza)+'<br><b>Attività:</b> '+escapeHtml(s.attivita);
+  const popup=new maplibregl.Popup({offset:18,maxWidth:'360px'}).setHTML(popupHtml);
+  new maplibregl.Marker({element:marker,anchor:'left'}).setLngLat([s.lon,s.lat]).setPopup(popup).addTo(map);
+  bounds.extend([s.lon,s.lat]);
+});
+if(stazioni.length){map.fitBounds(bounds,{padding:{top:70,bottom:70,left:70,right:260},maxZoom:10});}
+map.on('error',function(e){console.error(e.error||e);document.getElementById('errore').style.display='block';});
+</script>
+</body>
+</html>
